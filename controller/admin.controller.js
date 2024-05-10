@@ -1,47 +1,65 @@
 import bcrypt from "bcryptjs";
 import { userModel } from "../model/user.model.js";
 import jwt from "jsonwebtoken";
-import { SignIn_validate, SignUp_validate } from "../Schema_validation/auth.validation.js";
+import {
+  SignIn_validate,
+  SignUp_validate,
+} from "../Schema_validation/auth.validation.js";
 import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
+import { adminModel } from "../model/admin.model.js";
 dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+export const SignUp = async (req, res) => {
 
-export const SignUp = async (
- req, res
-) => {
-  // const { error } = SignUp_validate(req.body);
-  // if (error) return res.send(error.details[0].message);
- console.log("req.body: ", req.body);
-  const { password, email, firstName, lastName, company_name, country, office_no, cell_phone, occupation } = req.body;
-  
- 
+  console.log("req.body: ", req.body);
+  const {
+    password,
+    email,
+    firstName,
+    lastName,
+    phone,
+    role
+  } = req.body;
+
   // encrypt password by using bcrypt algorithm
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
   try {
-    const verifyEmail = await userModel.findOne({ email });
+    const verifyEmail = await adminModel.findOne({ email });
 
-    //checking EMAIL VALIDATION / DUPLICATION 
-    if (!verifyEmail) { 
-      const createUser = new userModel({ 
-          name: firstName, last_name:lastName,company_name, country, office_no, cell_phone, occupation,
-          email: email,
+    //checking EMAIL VALIDATION / DUPLICATION
+    if (!verifyEmail) {
+      const createUser = new userModel({
+        name: firstName,
+        last_name: lastName,
+       role,
+         phone,
+        email: email,
         password: hash,
       });
       await createUser.save();
       const token = jwt.sign(
         {
           name: firstName,
-          email: email,
+              email: email,
+          role: role
         },
         "token_secret_key"
       );
-      return res.status(200).json({success: true, status: 200, data: createUser, token: token});
+      return res
+        .status(200)
+        .json({ success: true, status: 200, data: createUser, token: token });
     } else {
-     return  res.status(400).json({success: false, status: 400, data: "email address has already registered!" });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          status: 400,
+          data: "email address has already registered!",
+        });
     }
   } catch (err) {
     // next(err);
@@ -54,13 +72,11 @@ export const SignUp = async (
 };
 
 // ----- sign in -----
-export const SignIn = async ( req, res) => {
-  // first we need to validate the data before saving it in DB
-  const { error } = SignIn_validate(req.body);
-  if (error) return res.status(400).json({message: error.details[0].message, success: false, status: 400});
+export const SignIn = async (req, res) => {
+
   console.log(req.body);
   try {
-    const User= await userModel.findOne({ email: req.body.email });
+    const User = await adminModel.findOne({ email: req.body.email });
     if (!User)
       return res.status(404).json({
         status: 404,
@@ -68,10 +84,7 @@ export const SignIn = async ( req, res) => {
         message: "User is not found!",
       });
     //   now checking password
-    const isCorrect = await bcrypt.compare(
-      req.body.password,
-      User.password
-    );
+    const isCorrect = await bcrypt.compare(req.body.password, User.password);
     // if the password is wrong.
     if (!isCorrect)
       return res.status(400).json({
@@ -80,7 +93,6 @@ export const SignIn = async ( req, res) => {
         message: "Wrong credentials",
       });
 
-    
     const token = jwt.sign(
       {
         id: User._id,
@@ -91,14 +103,12 @@ export const SignIn = async ( req, res) => {
     );
 
     const { password, ...detail } = User._doc;
-    res
-      .status(200)
-      .json({
-        success: true,
-        status: 200,
-        data: detail,
-        token: token,
-      });
+    res.status(200).json({
+      success: true,
+      status: 200,
+      data: detail,
+      token: token,
+    });
   } catch (error) {
     next(error);
   }
