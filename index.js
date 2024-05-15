@@ -6,6 +6,7 @@ import authRouter from "./router/auth.route.js";
 import { dbConnection } from "./db/connect.js";
 import paymentRouter from "./router/payment.route.js";
 import adminRouter from "./router/admin.route.js";
+import supplierRouter from "./router/supplier.route.js";
 
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.get("/", (req, res) => {
 // ------ Custom middlewares --------- 
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/supplier", supplierRouter);
 app.use("/api/v1/payment", paymentRouter);
 
 
