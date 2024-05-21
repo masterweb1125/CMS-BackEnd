@@ -36,6 +36,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/supplier", supplierRouter);
 app.use("/api/v1/payment", paymentRouter);
+app.use("/api/v1/", paymentRouter);
 
 
 // ----- Errors handler ------

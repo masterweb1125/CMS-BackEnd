@@ -108,6 +108,7 @@ export const SignIn = async (req, res) => {
         id: User._id,
         name: User.name,
         email: User.email,
+        role: "supplier"
       },
       "token_secret_key"
     );
