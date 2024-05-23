@@ -1,38 +1,81 @@
-import { boolean } from "joi";
 import mongoose from "mongoose";
 
-const bookingSchema = new mongoose.Schema(
+const tourSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: [true, "Name is required"],
     },
-    price: {
-      type: String,
-      required: [true, "Price is required"],
-    },
     category: {
       type: String,
       required: [true, "Category is required"],
     },
-    coverPic: {
-      type: String,
-    },
-    desc: {
-      type: String,
-    },
-    agent: [{ name: String, locationCity: String }],
+
     location: {
       type: String,
     },
+
+    languge: {
+      type: String,
+    },
+
+    tourPrice: {
+      type: String,
+      required: [true, "Price is required"],
+    },
+
+    priceAdult: {
+      type: String,
+    },
+
+    priceChild: {
+      type: String,
+    },
+    priceInfant: {
+      type: String,
+    },
+    startDate: {
+      type: String,
+    },
+    endDate: {
+      type: String,
+    },
+    singleDayTour: {
+      type: String,
+    },
+    tourClosingDate: {
+      type: String,
+    },
+    description: {
+      type: String,
+    },
+    instruction: {
+      type: String,
+    },
+    imageUrl: {
+      type: String,
+    },
+    videoUrl: {
+      type: String,
+    },
+    whatIncludes: [
+      {
+        type: String,
+      },
+    ],
+    whatNotIncludes: [
+      {
+        type: String,
+      },
+    ],
     viewers: {
       type: Number,
     },
     favorite: {
-      type: boolean,
+      type: Boolean,
     },
   },
   { timestamps: true }
 );
 
-export const bookingModel = mongoose.model("tour_place", bookingSchema);
+export const tourModel = mongoose.model("tour", tourSchema);

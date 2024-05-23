@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { SignIn, SignUp, emailVerification } from "../controller/admin.controller";
+import { SignIn, SignUp, emailVerification } from "../controller/admin.controller.js";
 
 
 const adminRouter = Router();
