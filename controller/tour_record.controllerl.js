@@ -34,3 +34,18 @@ export const retireveTours = async (req, res) => {
     });
   }
 };
+
+export const retrievingSingleTour = async (req, res) => {
+  const tourId = req.params.id;
+  try {
+    const tourData = await tourModel.findById(tourId);
+
+    res.status(200).json({ success: true, status: 200, data: tourData });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      status: 500,
+      error: error.message,
+    });
+  }
+};
