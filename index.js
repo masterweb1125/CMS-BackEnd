@@ -7,6 +7,7 @@ import paymentRouter from "./router/payment.route.js";
 import adminRouter from "./router/admin.route.js";
 import supplierRouter from "./router/supplier.route.js";
 import tourRouter from "./router/tour.route.js";
+import blogRouter from "./router/blog.route.js";
 
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/supplier", supplierRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/tour", tourRouter);
+app.use("/api/v1/blog", blogRouter);
 
 
 // ----- Errors handler ------
