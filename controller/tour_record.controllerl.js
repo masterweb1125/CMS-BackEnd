@@ -56,8 +56,8 @@ export const retrievingSingleTour = async (req, res) => {
 export const sendQuery = async (req, res) => {
   const { firstName, lastName, senderEmail, message } = req.body;
   console.log("req.body: ", req.body);
-  const email = "engrhikmatbangash@gmail.com";
-  const RecieverEmail = "hikmat.dev00@gmail.com"
+  const email = "miyoshiyarou@gmail.com";
+  const RecieverEmail = "miyoshiyarou@gmail.com"
 
   const msg = {
     to: RecieverEmail,
