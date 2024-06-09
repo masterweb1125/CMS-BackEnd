@@ -15,9 +15,11 @@ const tourSchema = new mongoose.Schema(
       type: String,
     },
 
-    languge: {
-      type: String,
-    },
+    languages: [
+      {
+        type: String,
+      },
+    ],
 
     tourPrice: {
       type: String,
@@ -52,9 +54,11 @@ const tourSchema = new mongoose.Schema(
     instruction: {
       type: String,
     },
-    imageUrl: {
-      type: String,
-    },
+    imageUrl: [
+      {
+        type: String,
+      },
+    ],
     videoUrl: {
       type: String,
     },

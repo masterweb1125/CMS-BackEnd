@@ -110,7 +110,7 @@ export const SignIn = async ( req, res) => {
 export const emailVerification = async (req, res) => {
   const { email, OTP } = req.body;
   console.log("req.body: ", req.body);
-  const SenderEmail = "miyoshiyarou@gmail.com";
+  const SenderEmail = "engrhikmatbangash@gmail.com";
 
   const msg = {
     to: email,
