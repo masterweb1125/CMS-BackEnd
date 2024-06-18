@@ -9,27 +9,25 @@ dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 
-export const SignUp = async (
- req, res
-) => {
+export const SignUp = async (req, res) => {
   // const { error } = SignUp_validate(req.body);
   // if (error) return res.send(error.details[0].message);
- console.log("req.body: ", req.body);
-  const { password, email, firstName, lastName, company_name, country, office_no, cell_phone, occupation } = req.body;
-  
- 
-  // encrypt password by using bcrypt algorithm
+  console.log("req.body: ", req.body);
+  const { password, email, firstName, lastName } = req.body;
+
+  // Encrypt password by using bcrypt algorithm
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
   try {
     const verifyEmail = await userModel.findOne({ email });
 
-    //checking EMAIL VALIDATION / DUPLICATION 
+    // Checking EMAIL VALIDATION / DUPLICATION 
     if (!verifyEmail) { 
       const createUser = new userModel({ 
-          name: firstName, last_name:lastName,company_name, country, office_no, cell_phone, occupation,
+          name: firstName, 
+          last_name: lastName,
           email: email,
-        password: hash,
+          password: hash,
       });
       await createUser.save();
       const token = jwt.sign(
@@ -41,10 +39,9 @@ export const SignUp = async (
       );
       return res.status(200).json({success: true, status: 200, data: createUser, token: token});
     } else {
-     return  res.status(400).json({success: false, status: 400, data: "email address has already registered!" });
+      return res.status(400).json({success: false, status: 400, data: "Email address has already been registered!" });
     }
   } catch (err) {
-    // next(err);
     return res.status(500).json({
       status: 500,
       success: false,
@@ -52,6 +49,7 @@ export const SignUp = async (
     });
   }
 };
+
 
 // ----- sign in -----
 export const SignIn = async ( req, res) => {
