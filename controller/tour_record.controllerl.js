@@ -4,32 +4,22 @@ dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-import { tourModel } from "../model/tour.model.js";
+import { tourModel } from "../model/booking.model.js";
 tourModel;
 
 export const createTour = async (req, res) => {
+  console.log("req.body: ", req.body);
+
   try {
-      const imageUrls = req.files ? req.files.map(file => `uploads/${file.filename}`) : [];
+    const tourData = await tourModel.create(req.body);
 
-      const {
-          languages,
-          whatIncludes,
-          whatNotIncludes,
-          ...rest
-      } = req.body;
-
-      const newTour = new tourModel({
-          ...rest,
-          imageUrl: imageUrls,
-          languages: Array.isArray(languages) ? languages : (languages ? [languages] : []),
-          whatIncludes: Array.isArray(whatIncludes) ? whatIncludes : (whatIncludes ? [whatIncludes] : []),
-          whatNotIncludes: Array.isArray(whatNotIncludes) ? whatNotIncludes : (whatNotIncludes ? [whatNotIncludes] : [])
-      });
-
-      const savedTour = await newTour.save();
-      res.status(201).send(savedTour);
+    res.status(200).json({ success: true, status: 200, data: tourData });
   } catch (error) {
-      res.status(400).send({ message: error.message });
+    res.status(500).json({
+      success: false,
+      status: 500,
+      error: error.message,
+    });
   }
 };
 

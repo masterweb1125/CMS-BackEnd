@@ -18,10 +18,10 @@ const adminSchema = new mongoose.Schema(
 
     phone: {
       type: String,
-        },
-        role: {
-        type: String,
-    }
+    },
+    role: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

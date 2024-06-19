@@ -9,25 +9,27 @@ dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 
-export const SignUp = async (req, res) => {
+export const SignUp = async (
+ req, res
+) => {
   // const { error } = SignUp_validate(req.body);
   // if (error) return res.send(error.details[0].message);
-  console.log("req.body: ", req.body);
-  const { password, email, firstName, lastName } = req.body;
-
-  // Encrypt password by using bcrypt algorithm
+ console.log("req.body: ", req.body);
+  const { password, email, firstName, lastName, company_name, country, office_no, cell_phone, occupation } = req.body;
+  
+ 
+  // encrypt password by using bcrypt algorithm
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
   try {
     const verifyEmail = await userModel.findOne({ email });
 
-    // Checking EMAIL VALIDATION / DUPLICATION 
+    //checking EMAIL VALIDATION / DUPLICATION 
     if (!verifyEmail) { 
       const createUser = new userModel({ 
-          name: firstName, 
-          last_name: lastName,
+          name: firstName, last_name:lastName,company_name, country, office_no, cell_phone, occupation,
           email: email,
-          password: hash,
+        password: hash,
       });
       await createUser.save();
       const token = jwt.sign(
@@ -39,9 +41,10 @@ export const SignUp = async (req, res) => {
       );
       return res.status(200).json({success: true, status: 200, data: createUser, token: token});
     } else {
-      return res.status(400).json({success: false, status: 400, data: "Email address has already been registered!" });
+     return  res.status(400).json({success: false, status: 400, data: "email address has already registered!" });
     }
   } catch (err) {
+    // next(err);
     return res.status(500).json({
       status: 500,
       success: false,
@@ -49,7 +52,6 @@ export const SignUp = async (req, res) => {
     });
   }
 };
-
 
 // ----- sign in -----
 export const SignIn = async ( req, res) => {
@@ -86,9 +88,8 @@ export const SignIn = async ( req, res) => {
         email: User.email,
         role: "user"
       },
-      "token_secret_key"
+      process.env.TOKENKEY
     );
-
     const { password, ...detail } = User._doc;
     res
       .status(200)
@@ -108,7 +109,7 @@ export const SignIn = async ( req, res) => {
 export const emailVerification = async (req, res) => {
   const { email, OTP } = req.body;
   console.log("req.body: ", req.body);
-  const SenderEmail = "engrhikmatbangash@gmail.com";
+  const SenderEmail = "miyoshiyarou@gmail.com"
 
   const msg = {
     to: email,
@@ -122,8 +123,7 @@ export const emailVerification = async (req, res) => {
   `,
   };
 
-  sgMail
-    .send(msg)
+  sgMail.send(msg)
     .then(() => {
       console.log("Email sent successfully"),
         res.status(200).json({

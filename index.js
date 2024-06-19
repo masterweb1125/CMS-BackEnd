@@ -8,8 +8,6 @@ import adminRouter from "./router/admin.route.js";
 import supplierRouter from "./router/supplier.route.js";
 import tourRouter from "./router/tour.route.js";
 import blogRouter from "./router/blog.route.js";
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 
 dotenv.config();
@@ -28,10 +26,6 @@ app.use(cors(corsOptions));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
-// ---- Define Static assets directory -----
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ---- Default/home page route --------
 app.get("/", (req, res) => {
