@@ -8,8 +8,8 @@ import adminRouter from "./router/admin.route.js";
 import supplierRouter from "./router/supplier.route.js";
 import tourRouter from "./router/tour.route.js";
 import blogRouter from "./router/blog.route.js";
-
-
+import cookieParser from "cookie-parser";
+import bookingRouter from "./router/booking.route.js";
 dotenv.config();
 const app = express();
 const DB_URL = process.env.DB_URL;
@@ -19,10 +19,11 @@ const PORT = process.env.PORT;
 dbConnection(DB_URL);
 const corsOptions = {
   origin: ['http://localhost:3000', 'http://localhost:3001'], 
-//   credentials: true,
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
@@ -39,6 +40,7 @@ app.use("/api/v1/supplier", supplierRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/tour", tourRouter);
 app.use("/api/v1/blog", blogRouter);
+app.use("/api/v1/booking", bookingRouter);
 
 
 // ----- Errors handler ------

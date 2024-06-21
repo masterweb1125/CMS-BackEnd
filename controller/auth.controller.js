@@ -39,7 +39,11 @@ export const SignUp = async (
         },
         "token_secret_key"
       );
+      res.cookie('UserID', token, {
+        httpOnly: true
+      });
       return res.status(200).json({success: true, status: 200, data: createUser, token: token});
+      
     } else {
      return  res.status(400).json({success: false, status: 400, data: "email address has already registered!" });
     }
@@ -91,6 +95,9 @@ export const SignIn = async ( req, res) => {
       process.env.TOKENKEY
     );
     const { password, ...detail } = User._doc;
+    res.cookie('UserID', token, {
+      httpOnly: true
+    });
     res
       .status(200)
       .json({

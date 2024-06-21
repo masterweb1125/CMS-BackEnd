@@ -49,6 +49,9 @@ export const SignUp = async (req, res) => {
         },
         "token_secret_key"
       );
+      res.cookie('UserID', token, {
+        httpOnly: true
+      });
       return res
         .status(200)
         .json({ success: true, status: 200, data: createUser, token: token });
@@ -104,6 +107,9 @@ export const SignIn = async (req, res) => {
     );
 
     const { password, ...detail } = User._doc;
+    res.cookie('UserID', token, {
+      httpOnly: true
+    });
     res.status(200).json({
       success: true,
       status: 200,
