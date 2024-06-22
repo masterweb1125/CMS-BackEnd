@@ -29,22 +29,26 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    pickupLocation:{
+      type:String,
+      required:[true,'Pickup Location is required']
+    },
     paymentStatus: {
       type: String,
       enum: ["paid", "pending", "failed"],
       default: "pending",
     },
-    bookingDate:{
-      type:Date,
-      required:[true,"Booking Date is required"]
+    bookingDate: {
+      type: String,
+      required: [true, "Booking Date is required"],
     },
-    departTime:{
-      type:String,
-      required:[true,"Booking departTime is required"]
+    departTime: {
+      type: String,
+      required: [true, "Booking departTime is required"],
     },
-    duration:{
-      type:Number,
-      required:[true,"duration is required"]
+    duration: {
+      type: Number,
+      required: [true, "duration is required"],
     },
     totalPrice: {
       type: Number,
@@ -54,8 +58,8 @@ const bookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create a compound index to enforce uniqueness on user and tour combination
-// bookingSchema.index({ user: 1, tour: 1,totalPrice: 1 }, { unique: true });
+// Create a compound index to enforce uniqueness on user, tour, and bookingDate combination
+bookingSchema.index({ user: 1, tour: 1, bookingDate: 1 }, { unique: true });
 
 const BookingModel = mongoose.model("booking", bookingSchema);
 
