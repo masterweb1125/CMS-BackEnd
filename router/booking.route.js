@@ -2,16 +2,24 @@ import { Router } from "express";
 
 import {
     createBooking,
+    TotalBookingShadular,
     getBookings,
+    getTotalBooking,
     getBookingById,
     updateBooking,
     deleteBooking,
+    getTotalRevenue,
     BookingVoucher,
   } from '../controller/booking.controller.js'
 const bookingRouter = Router();
 
 
 
+bookingRouter.get('/totalRevenue', getTotalRevenue);
+
+bookingRouter.get('/totalBooking', getTotalBooking);
+
+bookingRouter.get('/totalBookingShadular', TotalBookingShadular);
 // 
 bookingRouter.post('/', createBooking);
 
@@ -28,4 +36,5 @@ bookingRouter.put('/:id', updateBooking);
 bookingRouter.delete('/:id', deleteBooking);
 
 bookingRouter.post('/Voucher',BookingVoucher);
+
 export default bookingRouter;

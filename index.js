@@ -10,6 +10,7 @@ import tourRouter from "./router/tour.route.js";
 import blogRouter from "./router/blog.route.js";
 import cookieParser from "cookie-parser";
 import bookingRouter from "./router/booking.route.js";
+import { getTotalRevenue } from "./controller/booking.controller.js";
 dotenv.config();
 const app = express();
 const DB_URL = process.env.DB_URL;
@@ -26,6 +27,15 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
+// ---- Error handling middleware -----
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    status: 500,
+    success: false,
+    message: err.message,
+  });
+});
 
 
 // ---- Default/home page route --------
@@ -41,6 +51,9 @@ app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/tour", tourRouter);
 app.use("/api/v1/blog", blogRouter);
 app.use("/api/v1/booking", bookingRouter);
+// app.get('/api/v1/booking/totalRevenue',async()=>{
+//   console.log('helloooooooo')
+// })
 
 
 // ----- Errors handler ------
