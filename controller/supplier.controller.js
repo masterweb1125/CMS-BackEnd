@@ -7,6 +7,8 @@ import {
 } from "../Schema_validation/auth.validation.js";
 import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
+import { userModel } from "../model/user.model.js";
+import { roleModel } from "../model/role.model.js";
 dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -58,13 +60,11 @@ export const SignUp = async (req, res) => {
         .status(200)
         .json({ success: true, status: 200, data: createUser, token: token });
     } else {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          status: 400,
-          data: "email address has already registered!",
-        });
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        data: "email address has already registered!",
+      });
     }
   } catch (err) {
     // next(err);
@@ -108,7 +108,7 @@ export const SignIn = async (req, res) => {
         id: User._id,
         name: User.name,
         email: User.email,
-        role: "supplier"
+        role: "supplier",
       },
       "token_secret_key"
     );
@@ -130,7 +130,7 @@ export const SignIn = async (req, res) => {
 export const emailVerification = async (req, res) => {
   const { email, OTP } = req.body;
   console.log("req.body: ", req.body);
- const SenderEmail = "miyoshiyarou@gmail.com"
+  const SenderEmail = "miyoshiyarou@gmail.com";
 
   const msg = {
     to: email,
@@ -161,4 +161,20 @@ export const emailVerification = async (req, res) => {
         error: error,
       });
     });
+};
+
+export const GetAllSuppliers = async (req, res) => {
+  try {
+    const role = await roleModel.findOne({ rolename: 'supplier' });
+    if (!role) {
+      return res.status(404).json({ status: false, msg: "Supplier role not found" });
+    }
+    const suppliers = await userModel.find({}).then((item)=>{
+     const data = item.filter(i=>i.roleId.toString() === role._id.toString())
+      return res.status(200).json({ status: true, supplier: data, msg: "Success get suppliers" });
+    }).catch()
+  } catch (error) {
+    console.error("Error in GetAllSuppliers:", error);
+    return res.status(500).json({ msg: "Error in Get suppliers", error: error.message, status: false });
+  }
 };

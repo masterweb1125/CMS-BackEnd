@@ -10,7 +10,8 @@ import tourRouter from "./router/tour.route.js";
 import blogRouter from "./router/blog.route.js";
 import cookieParser from "cookie-parser";
 import bookingRouter from "./router/booking.route.js";
-import { getTotalRevenue } from "./controller/booking.controller.js";
+import Chat from "./router/chat.route.js";
+
 dotenv.config();
 const app = express();
 const DB_URL = process.env.DB_URL;
@@ -51,8 +52,9 @@ app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/tour", tourRouter);
 app.use("/api/v1/blog", blogRouter);
 app.use("/api/v1/booking", bookingRouter);
+app.use("/api/v1/chat", Chat);
 // app.get('/api/v1/booking/totalRevenue',async()=>{
-//   console.log('helloooooooo')
+//   console.log(object)
 // })
 
 
@@ -67,5 +69,5 @@ app.all("*", (req, res) => {
 
 // -------- app listening port number ---------
 app.listen(PORT, () => {
-  console.log(`App listening on port: ${PORT}`);
+  console.log(`App listening on port: http:localhost:${PORT}`);
 })

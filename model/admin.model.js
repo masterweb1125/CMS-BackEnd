@@ -19,8 +19,10 @@ const adminSchema = new mongoose.Schema(
     phone: {
       type: String,
     },
-    role: {
+    role: { 
       type: String,
+      enum: ['user', 'admin', 'agency','supplier'],
+      default: 'user'
     },
   },
   { timestamps: true }

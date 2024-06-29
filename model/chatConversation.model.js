@@ -1,24 +1,37 @@
 import mongoose from "mongoose";
 
-const bookingSchema = new mongoose.Schema(
+const Conversation = new mongoose.Schema(
   {
-    user: {
+    sender: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: [true, "User Id is required"],
-    },
-  admin:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Admin",
-    required: [true, "Admin Id is required"],
+      ref: 'User',
+      required: [true,'sender Id is required']
+  },
+  // recipient: {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: 'User',
+  //     required: [true,'recipient Id is required']
+  // },
+  booking:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'booking',
+    required:[true,'Booking Id is required']
+  },
+  lastmsgside:{
+    type:String,
+  },
+  lastmsg:{
+    type:String,
+  },
+  lastmsgstatus:{
+    type: String,
+    enum: ['sent', 'delivered', 'read'],
+    default: 'sent'
   }
   },
   { timestamps: true }
 );
 
-// Create a compound index to enforce uniqueness on user, tour, and bookingDate combination
-bookingSchema.index({ user: 1, tour: 1, bookingDate: 1 }, { unique: true });
+const ConversationModel = mongoose.model("Conversation", Conversation);
 
-const BookingModel = mongoose.model("booking", bookingSchema);
-
-export default BookingModel;
+export default ConversationModel;
