@@ -6,7 +6,7 @@ const tourRouter = Router();
 
 tourRouter.post("/create", createTour);
 tourRouter.get("/", retireveTours);
-tourRouter.get("/:id", retrievingSingleTour)
+tourRouter.post("/:id", retrievingSingleTour)
 tourRouter.post("/contactUs", sendQuery);
  
 
