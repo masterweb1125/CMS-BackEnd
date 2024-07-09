@@ -7,10 +7,17 @@ const bookingSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "User Id is required"],
     },
+    language: {
+      type:String,
+    },
     tour: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Tour",
       required: [true, "Tour Id is required"],
+    },
+    agencyId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
     },
     paymentType: {
       type: String,
@@ -49,6 +56,15 @@ const bookingSchema = new mongoose.Schema(
     duration: {
       type: Number,
       required: [true, "duration is required"],
+    },
+    status:{
+      type:String,
+      enum:["pandding","confrim","cancel"],
+      default:"pandding"
+     },
+    reviewStatus:{
+      type: Boolean,
+      default:false,
     },
     totalPrice: {
       type: Number,

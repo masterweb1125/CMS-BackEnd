@@ -11,6 +11,8 @@ import blogRouter from "./router/blog.route.js";
 import cookieParser from "cookie-parser";
 import bookingRouter from "./router/booking.route.js";
 import Chat from "./router/chat.route.js";
+import agencyRoute from "./router/agency.router.js";
+import ReviewsRoute from "./router/review.route.js"
 
 dotenv.config();
 const app = express();
@@ -48,11 +50,14 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/supplier", supplierRouter);
+app.use("/api/v1/agency", agencyRoute);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/tour", tourRouter);
 app.use("/api/v1/blog", blogRouter);
 app.use("/api/v1/booking", bookingRouter);
 app.use("/api/v1/chat", Chat);
+app.use("/api/v1/reviews", ReviewsRoute);
+app.use('/api/v1/agency',agencyRoute)
 // app.get('/api/v1/booking/totalRevenue',async()=>{
 //   console.log(object)
 // })

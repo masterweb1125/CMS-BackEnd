@@ -10,14 +10,18 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, "Category is required"],
     },
-
+    agencyId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"User",
+      required:[true,"tour agency Id iis required"]
+    },
     location: {
       type: String,
     },
 
-    languge: {
+    language: [{
       type: String,
-    },
+    },],
 
     tourPrice: {
       type: String,
@@ -73,6 +77,11 @@ const tourSchema = new mongoose.Schema(
     },
     favorite: {
       type: Boolean,
+    },
+     status: {
+      type: Number,
+      enum: [0,1,2,3],
+      default:0,
     },
   },
   { timestamps: true }

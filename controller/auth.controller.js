@@ -322,3 +322,13 @@ export const handleUpdateProfileImage = async (req, res) => {
     return res.status(500).json({ msg: "Server error in updating profile image", error: error.message, status: false });
   }
 };
+
+export const getUserById = async (req,res)=>{
+  try {
+    const id  =await  req.params.id;
+    const user =await userModel.findById(id);
+    res.status(200).json({data:user,status:false})
+  } catch (error) {
+    res.status(500).json({msg:error.message,status:false})
+  }
+}

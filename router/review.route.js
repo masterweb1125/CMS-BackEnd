@@ -1,14 +1,13 @@
 import express from 'express';
 import {
   createReview,
-  // getAllReviews,
-  // getReviewById,
   updateReview,
   deleteReview,
   getReviewDetailsById,
   getAllReviewsWithDetails,
   MakeReviewPublic,
-  Analytics
+  Analytics,
+  TourReview
 } from '../controller/review.controller.js';
 
 const ReviewsRoute = express.Router();
@@ -20,5 +19,6 @@ ReviewsRoute.put('/:id', updateReview);
 ReviewsRoute.delete('/:id', deleteReview);
 ReviewsRoute.get('/details/:id', getReviewDetailsById);
 ReviewsRoute.post('/public/:id', MakeReviewPublic);
+ReviewsRoute.get('/tour/:id', TourReview );
 
 export default ReviewsRoute;

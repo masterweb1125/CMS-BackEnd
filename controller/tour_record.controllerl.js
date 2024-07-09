@@ -5,6 +5,7 @@ dotenv.config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 import { tourModel } from "../model/booking.model.js";
+import BookingModel from "../model/tourbooking.model.js";
 tourModel;
 
 export const createTour = async (req, res) => {
@@ -37,7 +38,7 @@ export const retireveTours = async (req, res) => {
   }
 };
 
-export const retrievingSingleTour = async (req, res) => {
+export const retrievingSingleTourAgencyDahboard = async (req, res) => {
   const tourId = req.params.id;
   try {
     const tourData = await tourModel.findById(tourId);
@@ -51,17 +52,60 @@ export const retrievingSingleTour = async (req, res) => {
     });
   }
 };
+export const retrievingSingleTour = async (req, res) => {
+  const tourId = req.params.id;
+  const { userStatus, userId } = req.body;
+  try {
+    const tourData = await tourModel.findById(tourId);
+
+    if (userStatus) {
+      const userBooking = await BookingModel.findOne({
+        user: userId,
+        tour: tourId,
+      });
+      if (userBooking) {
+        // console.log(userBooking)
+        if (tourData.status === 2) {
+          if (!userBooking.reviewStatus) {
+            //  const review  = Review.find({userId:userId,tourId:tourId})
+            return res.status(201).json({
+              msg: "User review not exist",
+              bookingId: userBooking._id,
+              success: true,
+              data: tourData,
+              userStatus: userStatus,
+              showReview: true,
+            });
+          }
+        }
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      status: 200,
+      data: tourData,
+      userStatus: userStatus,
+      showReview: false,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      msg:error.message
+    });
+  }
+};
 
 // sending end-user queries through contact us form
 export const sendQuery = async (req, res) => {
   const { firstName, lastName, senderEmail, message } = req.body;
   console.log("req.body: ", req.body);
   const email = "engrhikmatbangash@gmail.com";
-  const RecieverEmail = "hikmat.dev00@gmail.com"
+  const RecieverEmail = "hikmat.dev00@gmail.com";
 
   const msg = {
     to: RecieverEmail,
-    from:email,
+    from: email,
     subject: "Help center - user queries",
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
