@@ -13,7 +13,7 @@ const tourSchema = new mongoose.Schema(
     agencyId:{
       type:mongoose.Schema.Types.ObjectId,
       ref:"User",
-      required:[true,"tour agency Id iis required"]
+      required:[true,"tour agency Id is required"]
     },
     location: {
       type: String,
@@ -64,12 +64,12 @@ const tourSchema = new mongoose.Schema(
     },
     whatIncludes: [
       {
-        type: String,
+        type: Object,
       },
     ],
     whatNotIncludes: [
       {
-        type: String,
+        type: Object,
       },
     ],
     viewers: {
