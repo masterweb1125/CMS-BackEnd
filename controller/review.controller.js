@@ -321,3 +321,43 @@ export const TourReview = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+
+export const TourReviewById = async (req, res) => {
+  try {
+    const tourId = req.params.id;
+    const reviews = await Review.find({ tourId: tourId });
+
+    if (!reviews.length) {
+      return res.status(404).json({ msg: "No reviews found for this tour", status: false, reviewLength: 0 });
+    }
+
+    const userIds = reviews.map(review => review.userId);
+    const users = await userModel.find({ _id: { $in: userIds } }).lean();
+
+    if (!users.length) {
+      return res.status(404).json({ msg: "No users found for the reviews", status: false });
+    }
+
+    // Create a map of userId to user object for easy lookup
+    const userMap = new Map(users.map(user => [user._id.toString(), user]));
+
+    // Create the data array
+    const data = reviews.map(review1 => {
+      const user = userMap.get(review1.userId.toString());
+      if (!user) {
+        console.warn(`User not found for review with userId: ${review1.userId}`);
+      }
+      return {
+        user: user,
+        review: review1
+      };
+    });
+
+    return res.status(200).json({ status: true, data: data, reviewLength: reviews.length });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: error.message, status: false });
+  }
+};

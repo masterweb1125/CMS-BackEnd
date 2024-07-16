@@ -12,8 +12,7 @@ import cookieParser from "cookie-parser";
 import bookingRouter from "./router/booking.route.js";
 import Chat from "./router/chat.route.js";
 import agencyRoute from "./router/agency.router.js";
-import ReviewsRoute from "./router/review.route.js"
-
+import ReviewsRoute from './router/review.route.js'
 dotenv.config();
 const app = express();
 const DB_URL = process.env.DB_URL;

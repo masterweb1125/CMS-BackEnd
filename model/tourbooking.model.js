@@ -57,15 +57,6 @@ const bookingSchema = new mongoose.Schema(
       type: Number,
       required: [true, "duration is required"],
     },
-    status:{
-      type:String,
-      enum:["pandding","confrim","cancel"],
-      default:"pandding"
-     },
-    reviewStatus:{
-      type: Boolean,
-      default:false,
-    },
     totalPrice: {
       type: Number,
       required: [true, "Total Price is required"],

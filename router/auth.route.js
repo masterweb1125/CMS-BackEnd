@@ -3,10 +3,10 @@ import { SignIn, SignUp, SocialAuth, emailVerification, getUserById, handleUpdat
 
 const authRouter = Router();
 
-authRouter.get('/:id',getUserById)
 authRouter.post('/social',SocialAuth)
 authRouter.post("/signup", SignUp);
 authRouter.post("/signin", SignIn);
+authRouter.get('/:id',getUserById)
 authRouter.post("/verifyemail", emailVerification);
 authRouter.post('/role',roleFind)
 authRouter.post('/roleId',roleFindById)

@@ -7,7 +7,8 @@ import {
   getAllReviewsWithDetails,
   MakeReviewPublic,
   Analytics,
-  TourReview
+  TourReview,
+  TourReviewById
 } from '../controller/review.controller.js';
 
 const ReviewsRoute = express.Router();
@@ -20,5 +21,6 @@ ReviewsRoute.delete('/:id', deleteReview);
 ReviewsRoute.get('/details/:id', getReviewDetailsById);
 ReviewsRoute.post('/public/:id', MakeReviewPublic);
 ReviewsRoute.get('/tour/:id', TourReview );
+ReviewsRoute.get('/tour/reviews/:id', TourReviewById );
 
 export default ReviewsRoute;

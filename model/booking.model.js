@@ -13,7 +13,7 @@ const tourSchema = new mongoose.Schema(
     agencyId:{
       type:mongoose.Schema.Types.ObjectId,
       ref:"User",
-      required:[true,"tour agency Id is required"]
+      required:[true,"tour agency Id iis required"]
     },
     location: {
       type: String,
@@ -77,11 +77,6 @@ const tourSchema = new mongoose.Schema(
     },
     favorite: {
       type: Boolean,
-    },
-     status: {
-      type: Number,
-      enum: [0,1,2,3],
-      default:0,
     },
   },
   { timestamps: true }
