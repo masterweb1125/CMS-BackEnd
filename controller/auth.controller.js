@@ -325,7 +325,7 @@ export const handleUpdateProfileImage = async (req, res) => {
 
 export const getUserById = async (req,res)=>{
   try {
-    const id  = req.parse.id;
+    const id  = req.params.id;
     const user =await userModel.findById(id);
     res.status(200).json({data:user,status:false})
   } catch (error) {

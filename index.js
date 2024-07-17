@@ -14,6 +14,7 @@ import Chat from "./router/chat.route.js";
 import agencyRoute from "./router/agency.router.js";
 import ReviewsRoute from './router/review.route.js'
 dotenv.config();
+import Referral from "./router/referral.router.js";
 const app = express();
 const DB_URL = process.env.DB_URL;
 const PORT = process.env.PORT;
@@ -57,6 +58,7 @@ app.use("/api/v1/booking", bookingRouter);
 app.use("/api/v1/chat", Chat);
 app.use("/api/v1/reviews", ReviewsRoute);
 app.use('/api/v1/agency',agencyRoute)
+app.use('/api/v1/referral',Referral)
 // app.get('/api/v1/booking/totalRevenue',async()=>{
 //   console.log(object)
 // })
