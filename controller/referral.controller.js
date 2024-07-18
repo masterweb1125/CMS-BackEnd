@@ -2,23 +2,40 @@ import { userModel } from "../model/user.model.js"
 import { roleModel } from "../model/role.model.js"
 import mongoose from "mongoose";
 
-export const getReferralUsers = async(req,res)=>{
-    try {
-        const agencyRole = await roleModel.findOne({ rolename: 'agency' });
-        const supplierRole = await roleModel.findOne({ rolename: 'supplier' });
+export const getReferralUsers = async (req, res) => {
+  try {
+      const agencyRole = await roleModel.findOne({ rolename: 'agency' });
+      const supplierRole = await roleModel.findOne({ rolename: 'supplier' });
 
-        if (!agencyRole || !supplierRole) {
-            return res.status(404).json({ msg: 'Roles not found', status: false });
-        }
-        const referralUsers = await userModel.find({
-            role: { $in: [agencyRole._id, supplierRole._id] }
-        });
-        
-        res.status(200).json({status:true,data:referralUsers})
-        
-    } catch (error) {
-        res.status(500).json({msg:error.meessage,status:false})
-    }
+      if (!agencyRole || !supplierRole) {
+          return res.status(404).json({ msg: 'Roles not found', status: false });
+      }
+
+      // Find users with the roles 'agency' and 'supplier'
+      const referralUsers = await userModel.find({
+          roleId: { $in: [agencyRole._id, supplierRole._id] }
+      }).lean(); // Using lean() to get plain JavaScript objects
+
+      // Fetch all roles to map role IDs to role names
+      const roles = await roleModel.find({ _id: { $in: [agencyRole._id, supplierRole._id] } }).lean();
+
+      // Create a role ID to role name map
+      const roleMap = roles.reduce((acc, role) => {
+          acc[role._id] = role.rolename;
+          return acc;
+      }, {});
+
+      // Add the role name to each user object
+      const usersWithRoleNames = referralUsers.map(user => ({
+          ...user,
+          rolename: roleMap[user.roleId]
+      }));
+
+      res.status(200).json({ status: true, data: usersWithRoleNames });
+
+  } catch (error) {
+      res.status(500).json({ msg: error.message, status: false });
+  }
 }
 
 

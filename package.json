@@ -14,6 +14,7 @@
     "formidable": "^3.5.1",
     "fs": "^0.0.1-security",
     "googleapis": "^136.0.0",
+    "http": "^0.0.1-security",
     "joi": "^17.12.3",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
