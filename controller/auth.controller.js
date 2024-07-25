@@ -12,6 +12,8 @@ import sgMail from "@sendgrid/mail";
 import { roleModel } from "../model/role.model.js";
 import dotenv from "dotenv";
 import { socialModel } from "../model/social.model.js";
+import mongoose from "mongoose";
+import { match } from "assert";
 dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -332,3 +334,37 @@ export const getUserById = async (req,res)=>{
     res.status(500).json({msg:error.message,status:false})
   }
 }
+
+export const GetAgencyAndSupplier = async (req, res) => {
+  try {
+    // Find roles "agency" and "supplier"
+    const roles = await roleModel.find({ rolename: { $in: ['agency', 'supplier'] } });
+    if (!roles.length) {
+      console.error('Roles not found');
+      return res.status(404).json({ msg: 'Roles not found', status: false });
+    }
+
+    const roleIds = roles.map((role) => role._id);
+    
+    // Find users with the roles of "agency" and "supplier"
+    const users = await userModel.find({ roleId: { $in: roleIds } });
+
+    const UpdatedUsers = users.map((item) => {
+      const matchedRole = roles.find((role) => item.roleId.toString() === role._id.toString());
+      
+      if (matchedRole) {
+        console.log(`Matched role for user ${item._id}:`, matchedRole); // Debugging log
+        return { ...item.toObject(), rolename: matchedRole.rolename }; // Ensure the user object is properly cloned
+      }
+      
+      console.log(`No matching role for user ${item._id}`); // Debugging log
+      return item.toObject(); // Convert Mongoose document to plain object
+    });
+    
+    console.log('Updated Users:', UpdatedUsers); // Debugging log
+    
+    res.status(200).json({ data: UpdatedUsers, status: true });
+  } catch (error) {
+    res.status(500).json({ msg: error.message, status: false });
+  }
+};

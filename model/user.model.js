@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema(
     facial_Number: { type: String,default:null},
     Register_As: { type: String ,default:null},
     occupation: { type: String,default:null },
+    wallet:{type:Number,default:0,},
     roleId:{type:mongoose.Schema.Types.ObjectId,required:[true,'role id is required']}
   },
   { timestamps: true }

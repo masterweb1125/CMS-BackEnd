@@ -13,7 +13,13 @@ const tourSchema = new mongoose.Schema(
     agencyId:{
       type:mongoose.Schema.Types.ObjectId,
       ref:"User",
-      required:[true,"tour agency Id iis required"]
+      default:null
+      // required:[true,"tour agency Id iis required"]
+    },
+    adminId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'User',
+      default:null
     },
     location: {
       type: String,

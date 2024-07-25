@@ -18,6 +18,12 @@ const bookingSchema = new mongoose.Schema(
     agencyId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
+        default:null
+    },
+    adminId:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'User',
+      default:null
     },
     paymentType: {
       type: String,

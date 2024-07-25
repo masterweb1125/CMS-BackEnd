@@ -158,3 +158,4 @@ export const emailVerification = async (req, res) => {
       });
     });
 };
+

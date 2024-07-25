@@ -3,15 +3,18 @@ import mongoose from 'mongoose';
 const discountSchema = new mongoose.Schema({
   name: {
     type: String,
-    // required: true
+    required: true
+  },
+  code:{
+    type:String,
   },
   value: {
     type: Number,
-    // required: true
+    required: true
   },
   expirationDate: {
     type: String,
-    // required: true
+    required: true
   },
   conditions: {
     type: Map,
@@ -22,10 +25,21 @@ const discountSchema = new mongoose.Schema({
     type: Number,
     default: 1
   },
+  userMaxLimit: {
+    type: Number,
+    default: 1
+  },
+  users:[
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"User"
+    }
+  ],
   timesUsed: {
     type: Number,
     default: 0
   },
+
   isActive: {
     type: Boolean,
     // default: true
