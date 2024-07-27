@@ -10,6 +10,7 @@ import {
     deleteBooking,
     getTotalRevenue,
     BookingVoucher,
+    checkBooking,
   } from '../controller/booking.controller.js'
 const bookingRouter = Router();
 
@@ -36,5 +37,7 @@ bookingRouter.put('/:id', updateBooking);
 bookingRouter.delete('/:id', deleteBooking);
 
 bookingRouter.post('/Voucher',BookingVoucher);
+
+bookingRouter.post('/check',checkBooking)
 
 export default bookingRouter;

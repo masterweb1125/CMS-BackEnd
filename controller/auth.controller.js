@@ -340,7 +340,7 @@ export const GetAgencyAndSupplier = async (req, res) => {
     // Find roles "agency" and "supplier"
     const roles = await roleModel.find({ rolename: { $in: ['agency', 'supplier'] } });
     if (!roles.length) {
-      console.error('Roles not found');
+
       return res.status(404).json({ msg: 'Roles not found', status: false });
     }
 
@@ -353,11 +353,10 @@ export const GetAgencyAndSupplier = async (req, res) => {
       const matchedRole = roles.find((role) => item.roleId.toString() === role._id.toString());
       
       if (matchedRole) {
-        console.log(`Matched role for user ${item._id}:`, matchedRole); // Debugging log
         return { ...item.toObject(), rolename: matchedRole.rolename }; // Ensure the user object is properly cloned
       }
       
-      console.log(`No matching role for user ${item._id}`); // Debugging log
+ 
       return item.toObject(); // Convert Mongoose document to plain object
     });
     

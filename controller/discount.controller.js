@@ -75,3 +75,67 @@ export const createDiscount = async (req, res) => {
     }
   };
   
+ 
+
+  
+export const applyDiscountCode = async (req, res) => {
+  const { code, orderTotal, userId } = req.body;
+
+  // Validate input
+  if (!code || !orderTotal || !userId) {
+    return res.status(200).json({ msg: 'Code, order total, and user ID are required',status:false });
+  }
+
+  try {
+    // Find the discount code
+    const discount = await discountModel.findOne({ code: code.toUpperCase() });
+
+    // Check if discount code exists
+    if (!discount) {
+      return res.status(200).json({ msg: 'Invalid discount code',status:false });
+    }
+
+    // Check if discount code is active
+    if (!discount.isActive) {
+      return res.status(200).json({ msg: 'Discount code is not active',status:false });
+    }
+
+    // Check if discount code has expired
+    const currentDate = new Date();
+    if (new Date(discount.expirationDate) < currentDate) {
+      return res.status(200).json({ msg: 'Discount code has expired',status:false });
+    }
+
+    // Check if user is eligible for the discount
+    if (discount.users.includes(userId)) {
+      return res.status(200).json({ msg: 'User not eligible for this discount',status:false});
+    }
+
+    // // Check if the order meets the minimum purchase amount
+    // if (discount.conditions && discount.conditions.minPurchaseAmount) {
+    //   const minPurchaseAmount = parseFloat(discount.conditions.minPurchaseAmount.split(' ')[0]);
+    //   if (orderTotal < minPurchaseAmount) {
+    //     return res.status(400).json({ message: `Minimum purchase amount is ${discount.conditions.minPurchaseAmount}` });
+    //   }
+    // }
+
+    // Calculate the discount amount (assuming discount.value is a percentage)
+    const discountAmount = (orderTotal * discount.value) / 100;
+    const newTotal = orderTotal - discountAmount;
+
+    // Update the discount to add the user ID to the users array
+    // discount.users.push(userId);
+    // await discount.save();
+
+    // Respond with the new order total and discount amount
+    res.status(200).json({
+      msg: 'Discount applied successfully',
+      discountAmount,
+      data:{...discount},
+      newTotal,
+      status:true
+    });
+  } catch (error) {
+    res.status(500).json({ msg: error.message,status:false });
+  }
+};

@@ -13,13 +13,13 @@ export const createBooking = async (req, res) => {
     const existingBooking = await BookingModel.findOne({user:user,tour:tour,bookingDate:bookingDate});
     if (existingBooking) {
       // console.log('create booking api backend')
-      return res.status(200).json({ msg: 'Booking already exists', booking: existingBooking });
+      return res.status(200).json({ msg: 'Booking already exists', booking: existingBooking,status:false});
     }
     
     // // Create the new booking
-    const newBooking =await new BookingModel(req.body);
-    await newBooking.save();
-    return res.status(201).json(newBooking);
+    const newBooking =await  BookingModel.create(req.body);
+
+     res.status(201).json({status:true,data:newBooking});
   } catch (error) {
     console.log('create booking error', error);
     res.status(400).json({ message: error.message });
@@ -280,3 +280,18 @@ export const TotalBookingShadular = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+
+export const checkBooking = async (req,res)=>{
+  try {
+
+    const existingBooking = await BookingModel.findOne({user:req.body.user,tour:req.body.tour,bookingDate:req.body.bookingDate});
+    if (existingBooking) {
+      // console.log('create booking api backend')
+      return res.status(200).json({ msg: 'Booking already exists', booking: existingBooking,status:false});
+    }
+    res.status(200).json({status:true});
+  } catch (error) {
+    res.status(500).json({msg:error.message,status:false});
+  }
+}
