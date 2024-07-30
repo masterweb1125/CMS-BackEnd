@@ -27,7 +27,7 @@ const bookingSchema = new mongoose.Schema(
     },
     paymentType: {
       type: String,
-      enum: ["credit_card", "debit_card", "paypal", "bank_transfer"],
+      enum: ["credit_card", "debit_card", "paypal", "bank_transfer",'stripe'],
       required: true,
     },
     totalAdult: {
@@ -51,6 +51,11 @@ const bookingSchema = new mongoose.Schema(
       enum: ["paid", "pending", "failed"],
       default: "pending",
     },
+    status:{
+      type:String,
+      enum:['pending',"confirmed","cancelled",'completed'],
+      default:'pending'
+     },
     bookingDate: {
       type: String,
       required: [true, "Booking Date is required"],

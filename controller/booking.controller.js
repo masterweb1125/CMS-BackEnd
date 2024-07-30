@@ -36,6 +36,37 @@ export const getBookings = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+export const getBookingsWithTourData = async (req, res) => {
+  try {
+    // Fetch all bookings
+    const bookings = await BookingModel.find();
+
+    // Fetch all tour IDs from the bookings
+    const tourIds = bookings.map(item => item.tour);
+
+    // Fetch all tours in a single query
+    const tours = await tourModel.find({ _id: { $in: tourIds } });
+
+    // Create a map of tour IDs to tour data for quick lookup
+    const tourMap = new Map();
+    tours.forEach(tour => {
+      tourMap.set(tour._id.toString(), tour);
+    });
+
+    // Attach tour data to each booking
+    const bookingsWithTourData = bookings.map(item => {
+      const tour = tourMap.get(item.tour.toString());
+      return {
+        ...item.toObject(),
+        tour,
+      };
+    });
+
+    res.status(200).json({status:true,data:bookingsWithTourData});
+  } catch (error) {
+    res.status(500).json({ msg: error.message,status:false });
+  }
+};
 
 
 // Get a single booking by ID

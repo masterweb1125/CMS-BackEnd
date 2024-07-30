@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { hendleLiveChat } from "../controller/chat.controller.js";
+import { handleLiveChat } from "../controller/chat.controller.js";
 
 const Chat = Router();
 
 
 
-Chat.post('/', hendleLiveChat );
+Chat.post('/', handleLiveChat );
  export default Chat; 

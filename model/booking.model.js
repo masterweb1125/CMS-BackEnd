@@ -10,24 +10,26 @@ const tourSchema = new mongoose.Schema(
       type: String,
       required: [true, "Category is required"],
     },
-    agencyId:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"User",
-      default:null
+    agencyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
       // required:[true,"tour agency Id iis required"]
     },
-    adminId:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:'User',
-      default:null
+    adminId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
     },
     location: {
       type: String,
     },
 
-    language: [{
-      type: String,
-    },],
+    language: [
+      {
+        type: String,
+      },
+    ],
 
     tourPrice: {
       type: String,

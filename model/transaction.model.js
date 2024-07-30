@@ -22,7 +22,7 @@ const transactionSchema = new mongoose.Schema({
   },
   type: { 
     type: String, 
-    enum: ['stripe', 'paypal'], // Restricting to specific values
+    enum: ['stripe', 'paypal','credit'], // Restricting to specific values
     required:true
   },
   amount: { 
@@ -47,7 +47,7 @@ const transactionSchema = new mongoose.Schema({
   timestamps: true // Automatically manage createdAt and updatedAt fields
 });
 
-transactionSchema.index({ userId: 1, bookingId: 1 }, { unique: true });
+// transactionSchema.index({ userId: 1, bookingId: 1 }, { unique: true });
  
 export const transactionModel = mongoose.model('Transaction', transactionSchema);
 

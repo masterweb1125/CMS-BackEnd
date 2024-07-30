@@ -7,26 +7,22 @@ const Conversation = new mongoose.Schema(
       ref: 'User',
       required: [true,'sender Id is required']
   },
-  // recipient: {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: 'User',
-  //     required: [true,'recipient Id is required']
-  // },
-  booking:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:'booking',
-    required:[true,'Booking Id is required']
+  recipient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true,'recipient Id is required']
   },
   lastmsgside:{
-    type:String,
+    type:Boolean,
   },
   lastmsg:{
     type:String,
   },
+  // 1 = send 2 deliver 3 = seen 4 panding
   lastmsgstatus:{
-    type: String,
-    enum: ['sent', 'delivered', 'read'],
-    default: 'sent'
+    type: Number,
+    enum: [1,2,3,4],
+
   }
   },
   { timestamps: true }

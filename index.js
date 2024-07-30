@@ -10,6 +10,7 @@ import tourRouter from "./router/tour.route.js";
 import blogRouter from "./router/blog.route.js";
 import cookieParser from "cookie-parser";
 import bookingRouter from "./router/booking.route.js";
+import settingRouter from './router/setting.router.js'
 import Chat from "./router/chat.route.js";
 import agencyRoute from "./router/agency.router.js";
 import ReviewsRoute from './router/review.route.js'
@@ -18,6 +19,7 @@ import Referral from "./router/referral.router.js";
 import SearchRouter from "./router/search.router.js";
 import DiscountRouter from "./router/discount.router.js";
 import transactionRouter from "./router/transaction.router.js";
+import shiftRouter from "./router/shift.router.js";
 const app = express();
 const DB_URL = process.env.DB_URL;
 const PORT = process.env.PORT;
@@ -65,12 +67,13 @@ app.use('/api/v1/referral',Referral)
 app.use('/api/v1/search',SearchRouter)
 app.use('/api/v1/discount',DiscountRouter)
 app.use('/api/v1/transaction',transactionRouter)
+app.use('/api/v1/setting',settingRouter)
+app.use('/api/v1/shift',shiftRouter)
 // app.get('/api/v1/booking/totalRevenue',async()=>{
 //   console.log(object)
 // })
 
 
-// ----- Errors handler ------
 app.all("*", (req, res) => {
   res.status(500).json({
     status: 500,

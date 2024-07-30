@@ -1,56 +1,66 @@
 import ConversationModel from "../model/chatConversation.model.js";
 import MessageModel from "../model/message.model.js";
 
-export const hendleLiveChat = async (req, res) => {
-  const { sender, booking, lastmsgstatus, lastmsg, lastmsgside } = req.body;
-  const ConversationExist = await ConversationModel.find({ sender, booking });
-  if (ConversationExist) {
-    const Updated = await ConversationModel.find({ sender, booking }).updateOne(
-      {
-        lastmsg,
-        lastmsgside,
-        lastmsgstatus,
-      }
-    );
-    const con = await ConversationModel.find({ sender, booking })
-      .then(async (item) => {
-        const message = await MessageModel.create({
-          content: lastmsg,
-          conversationId: item[0]._id,
-          sender:lastmsgside
-        });
-        await message.save()
-        // .then((item)=>{
-          return res.status(200).json({
-            msg: "Conversation alrady exist but credential updated",
-            conversation: item[0],
-            msgData:message,
-            status: "updated",
-          });
-        // }).catch((error)=>{
-        //   console.log(error)
-        // })
+export const handleLiveChat = async (req, res) => {
+  try {
+    const { sender, recipient, lastmsgstatus, lastmsg, lastmsgside } = req.body;
 
-       
-      })
-      .catch((error) => {
-        console.log("Error", error);
+    // Check if the conversation already exists
+    let conversation = await ConversationModel.findOne({ sender, recipient });
+
+    if (conversation) {
+      // Update the existing conversation
+      conversation.lastmsg = lastmsg;
+      conversation.lastmsgside = lastmsgside;
+      conversation.lastmsgstatus = lastmsgstatus;
+      await conversation.save();
+
+      // Create a new message for the existing conversation
+      const message = await MessageModel.create({
+        content: lastmsg,
+        conversationId: conversation._id,
+        sender: lastmsgside,
       });
+
+      return res.status(200).json({
+        msg: "Conversation already exists but credentials updated",
+        conversation,
+        msgData: message,
+        status: true,
+      });
+    } else {
+      // Create a new conversation
+      conversation = new ConversationModel(req.body);
+      await conversation.save();
+
+      // Create a new message for the new conversation
+      const message = await MessageModel.create({
+        content: lastmsg,
+        conversationId: conversation._id,
+      });
+
+      return res.status(200).json({
+        msg: "Conversation was created",
+        conversation,
+        msgData: message,
+        status: true,
+      });
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ msg: error.message,status:false});
   }
-  const newConversation = await ConversationModel.create(req.body);
-  await newConversation.save();
-  // const message = await MessageModel.create({
-  //   conversationId: con._id,
-  //   content: lastmsg,
-  // });
-  // console.log(newConversation);
-  return res.status(200).json({
-    msg: "Conversation was created",
-    conversation: newConversation,
-    status: "created",
-  });
 };
+
 
 export const GetConversation = async (req,res)=>{
 //  const conversations
+}
+
+export const  GetAllMessages = async ()=>{
+try {
+  
+} catch (error) {
+  res.status(500).json({msg:error.message})
+}
 }

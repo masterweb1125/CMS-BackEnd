@@ -11,6 +11,7 @@ import {
     getTotalRevenue,
     BookingVoucher,
     checkBooking,
+    getBookingsWithTourData,
   } from '../controller/booking.controller.js'
 const bookingRouter = Router();
 
@@ -39,5 +40,5 @@ bookingRouter.delete('/:id', deleteBooking);
 bookingRouter.post('/Voucher',BookingVoucher);
 
 bookingRouter.post('/check',checkBooking)
-
+ bookingRouter.post('/bookintwithalldata',getBookingsWithTourData)
 export default bookingRouter;

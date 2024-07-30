@@ -11,17 +11,12 @@ const Message = new mongoose.Schema(
         type: String,
         required: true
     },
-    status: {
-        type: String,
-        enum: ['send', 'delivered', 'read'],
-        default: 'sent'
-    },
-    sender:{
-      type: String,
-      enum: ['client', 'admin'],
-
+    status:{
+      type: Number,
+      enum: [1,2,3,4],
+  
     }
- 
+   
   },
   { timestamps: true }
 );

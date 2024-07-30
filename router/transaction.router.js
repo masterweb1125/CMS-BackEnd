@@ -1,10 +1,11 @@
 import express from 'express';
-import { createTransaction, deleteTransaction, getAllTransactions, getTransactionById, updateTransaction } from '../controller/transaction.controller.js';
+import { createTransaction, createTransactionForWallet, deleteTransaction, getAllTransactions, getTransactionById, updateTransaction } from '../controller/transaction.controller.js';
 
 const transactionRouter = express.Router();
  
 // Create a new transaction
 transactionRouter.post('/', createTransaction);
+transactionRouter.post('/wallet', createTransactionForWallet);
 
 // Get all transactions
 transactionRouter.get('/', getAllTransactions);
