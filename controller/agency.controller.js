@@ -2,11 +2,10 @@ import { roleModel } from "../model/role.model.js";
 import { userModel } from "../model/user.model.js";
 import BookingModel from "../model/tourbooking.model.js"
 import { tourModel } from "../model/booking.model.js";
-
+import Review from '../model/review.model.js'
 
 // import roleModel from '../model/role.model.js';
 // import userModel from '../model/user.model.js';
-
 export const GetAllAgencies = async (req, res) => {
   try {
     const role = await roleModel.findOne({ rolename: "agency" });
@@ -25,17 +24,19 @@ export const GetAllAgencies = async (req, res) => {
 
     const totalAgency = agencies.length;
 
-    // Example: Fetch recent bookings (adjust this part based on your booking model)
+    // Fetch bookings for the last month
     const recentBookings = await BookingModel.find({
       agencyId: { $in: agencies.map(agency => agency._id) },
       createdAt: { $gte: new Date(new Date().setMonth(new Date().getMonth() - 1)) } // Example: Fetch bookings from the last month
     });
 
+    // Fetch bookings for the current month
     const currentMonthBookings = await BookingModel.find({
       agencyId: { $in: agencies.map(agency => agency._id) },
       createdAt: { $gte: new Date(new Date().setMonth(new Date().getMonth())) } // Example: Fetch bookings from the current month
     });
 
+    // Fetch bookings for the previous month
     const previousMonthBookings = await BookingModel.find({
       agencyId: { $in: agencies.map(agency => agency._id) },
       createdAt: {
@@ -54,8 +55,29 @@ export const GetAllAgencies = async (req, res) => {
     // Calculate recent bookings as a percentage of total agencies
     const recentBookingPercentage = (recentBookingCount / totalAgency) * 100;
 
+    // Calculate total revenue, total number of tours, and total number of reviews for each agency
+    const agencyRevenues = await Promise.all(agencies.map(async (agency) => {
+      const agencyBookings = await BookingModel.find({ agencyId: agency._id });
+      const totalRevenue = agencyBookings.reduce((sum, booking) => sum + booking.totalPrice, 0);
+
+      const totalTours = await tourModel.countDocuments({ agencyId: agency._id }); // Assuming you have a TourModel for tours
+      const tours = await tourModel.find({ agencyId: agency._id });
+      const tourIds = tours.map(tour => tour._id);
+
+      // Count reviews for these tours
+      const totalReviews = await Review.countDocuments({ tourId: { $in: tourIds } });
+
+
+      return {
+        ...agency._doc,
+        totalRevenue,
+        totalTours,
+        totalReviews
+      };
+    }));
+
     res.status(200).json({
-      data: agencies,
+      data: agencyRevenues,
       status: true,
       totalAgency,
       recentBookingCount,
@@ -68,6 +90,7 @@ export const GetAllAgencies = async (req, res) => {
     res.status(500).json({ msg: error.message, status: false });
   }
 };
+
 
 const getCurrentMonthRange = () => {
   const now = new Date();

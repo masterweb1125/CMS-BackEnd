@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import {userModel} from '../model/user.model.js'
 import { tourModel } from "../model/booking.model.js";
 import {format,parse,getHours, getMinutes} from 'date-fns'
+import {shiftModel} from '../model/shift.model.js'
 // Create a new booking
 import moment from 'moment';
 export const createBooking = async (req, res) => {
@@ -326,3 +327,4 @@ export const checkBooking = async (req,res)=>{
     res.status(500).json({msg:error.message,status:false});
   }
 }
+

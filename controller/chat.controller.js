@@ -3,7 +3,8 @@ import MessageModel from "../model/message.model.js";
 
 export const handleLiveChat = async (req, res) => {
   try {
-    const { sender, recipient, lastmsgstatus, lastmsg, lastmsgside } = req.body;
+    
+    const { sender, recipient, lastmsgstatus, lastmsg, lastmsgside,} = req.body;
 
     // Check if the conversation already exists
     let conversation = await ConversationModel.findOne({ sender, recipient });
@@ -19,7 +20,9 @@ export const handleLiveChat = async (req, res) => {
       const message = await MessageModel.create({
         content: lastmsg,
         conversationId: conversation._id,
-        sender: lastmsgside,
+        status: lastmsgstatus,
+        sender:sender,
+        recipient:recipient,
       });
 
       return res.status(200).json({
@@ -57,10 +60,20 @@ export const GetConversation = async (req,res)=>{
 //  const conversations
 }
 
-export const  GetAllMessages = async ()=>{
-try {
-  
-} catch (error) {
-  res.status(500).json({msg:error.message})
-}
-}
+export const GetAllMessages = async (req, res) => {
+  try {
+    const recipient = req.params.recipientId;
+    const sender = req.params.senderId;
+
+    const messages = await MessageModel.find({
+      $or: [
+        { sender: sender, recipient: recipient },
+        { sender: recipient, recipient: sender }
+      ]
+    });
+
+    res.status(200).json({ messages, status: true });
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+};

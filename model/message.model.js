@@ -11,6 +11,16 @@ const Message = new mongoose.Schema(
         type: String,
         required: true
     },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true,'sender Id is required']
+  },
+  recipient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true,'recipient Id is required']
+  },
     status:{
       type: Number,
       enum: [1,2,3,4],
