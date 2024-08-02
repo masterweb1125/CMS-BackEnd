@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
-export const dbConnection = (DB_URL) => {
+export const dbConnection = async (DB_URL) => {
   mongoose.set("strictQuery", true);
   
-    mongoose.connect(DB_URL, {
+ await   mongoose.connect(DB_URL, {
         autoIndex: true,
       })
       .then(() => {
