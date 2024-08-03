@@ -122,10 +122,142 @@ const getLastMonthRange = () => {
   return { start, end };
 };
 
+// export const getAgencyDashboardAnalytics = async (req, res) => {
+//   try {
+//     const setting = await settingModel.findById("66a63f4a44709647efc24d2d");
+//     const COMMISSION_PERCENTAGE = setting.serviceCharges.agency_percentage;
+
+//     const { agencyId } = req.params;
+//     const currentDate = new Date();
+//     const oneDayLater = new Date(currentDate);
+//     oneDayLater.setDate(currentDate.getDate() + 1);
+
+//     const currentMonthRange = getCurrentMonthRange();
+//     const lastMonthRange = getLastMonthRange();
+
+//     // Fetch recent bookings
+//     const recentBookings = await BookingModel.find({
+//       agencyId: agencyId,
+//       bookingDate: {
+//         $gte: oneDayLater,
+//       },
+//     });
+
+//     // Fetch current month bookings
+//     const currentMonthBookings = await BookingModel.find({
+//       agencyId: agencyId,
+//       bookingDate: {
+//         $gte: currentMonthRange.start,
+//         $lte: currentMonthRange.end,
+//       },
+//     });
+
+//     // Fetch last month bookings
+//     const lastMonthBookings = await BookingModel.find({
+//       agencyId: agencyId,
+//       bookingDate: {
+//         $gte: lastMonthRange.start,
+//         $lte: lastMonthRange.end,
+//       },
+//     });
+//     const totalagencybookings = await BookingModel.find({ agencyId: agencyId });
+//     // console.log(totalagencybookings)
+
+//     // Calculate total commission earned
+//     const totalCommission = totalagencybookings.reduce(
+//       (acc, booking) => acc + booking.totalPrice * COMMISSION_PERCENTAGE,
+//       0
+//     );
+
+//     // Calculate current month commission
+//     const currentMonthProfit = currentMonthBookings.reduce(
+//       (acc, booking) => acc + booking.totalPrice * COMMISSION_PERCENTAGE,
+//       0
+//     );
+
+//     // Calculate last month commission
+//     const lastMonthProfit = lastMonthBookings.reduce(
+//       (acc, booking) => acc + booking.totalPrice * COMMISSION_PERCENTAGE,
+//       0
+//     );
+
+//     // Calculate percentage difference in commissions
+//     const profitPercentageDifference =
+//       lastMonthProfit === 0
+//         ? 100
+//         : ((currentMonthProfit - lastMonthProfit) / lastMonthProfit) * 100;
+//     //   calculate Current Incentives
+
+//     // Calculate total current incentives (assuming it's 5% of total price)
+//     const CURRENT_INCENTIVES_PERCENTAGE = 0.05; // Assuming current incentives rate is 5%
+//     const totalCurrentIncentives = recentBookings.reduce(
+//       (acc, booking) =>
+//         acc + booking.totalPrice * CURRENT_INCENTIVES_PERCENTAGE,
+//       0
+//     );
+
+//     // Calculate current month incentives
+//     const currentMonthIncentives = currentMonthBookings.reduce(
+//       (acc, booking) =>
+//         acc + booking.totalPrice * CURRENT_INCENTIVES_PERCENTAGE,
+//       0
+//     );
+
+//     // Calculate last month incentives
+//     const lastMonthIncentives = lastMonthBookings.reduce(
+//       (acc, booking) =>
+//         acc + booking.totalPrice * CURRENT_INCENTIVES_PERCENTAGE,
+//       0
+//     );
+
+//     // Calculate percentage difference in commissions
+//     // const profitPercentageDifference = lastMonthProfit === 0 ? 100 : ((currentMonthProfit - lastMonthProfit) / lastMonthProfit) * 100;
+
+//     // Calculate percentage difference in incentives
+//     const incentivesPercentageDifference =
+//       lastMonthIncentives === 0
+//         ? 100
+//         : ((currentMonthIncentives - lastMonthIncentives) /
+//             lastMonthIncentives) *
+//           100;
+
+//     // Calculate percentage difference in booking counts
+//     const currentMonthCount = currentMonthBookings.length;
+//     const lastMonthCount = lastMonthBookings.length;
+//     const percentageDifference =
+//       lastMonthCount === 0
+//         ? 100
+//         : ((currentMonthCount - lastMonthCount) / lastMonthCount) * 100;
+
+//     res.json({
+//       recentBookings,
+//       statistics: {
+//         currentMonthCount,
+//         lastMonthCount,
+//         percentageDifference,
+//         totalCommission,
+//         currentMonthProfit,
+//         lastMonthProfit,
+//         profitPercentageDifference,
+//         totalCurrentIncentives,
+//         currentMonthIncentives,
+//         lastMonthIncentives,
+//         incentivesPercentageDifference,
+//       },
+//     });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 export const getAgencyDashboardAnalytics = async (req, res) => {
   try {
+    // Fetch the settings
     const setting = await settingModel.findById("66a63f4a44709647efc24d2d");
     const COMMISSION_PERCENTAGE = setting.serviceCharges.agency_percentage;
+    const SALES_TARGET_BONUS_PERCENTAGE = setting.serviceCharges.agency_selas_targat_bounes;
+    const ADDITIONAL_BOOKING_INCENTIVE = setting.serviceCharges.agency_additional_selas_amount;
+    const SALES_TARGET = setting.serviceCharges.agency_selas_targat;
+    const IS_ADDITIONAL_INCENTIVE_FIXED_AMOUNT = setting.serviceCharges.isAdditionalIncentiveFixedAmount;
 
     const { agencyId } = req.params;
     const currentDate = new Date();
@@ -160,24 +292,30 @@ export const getAgencyDashboardAnalytics = async (req, res) => {
         $lte: lastMonthRange.end,
       },
     });
-    const totalagencybookings = await BookingModel.find({ agencyId: agencyId });
-    // console.log(totalagencybookings)
+
+    const totalAgencyBookings = await BookingModel.find({ agencyId: agencyId });
+
+    // Calculate total sales
+    const totalSales = totalAgencyBookings.reduce(
+      (acc, booking) => acc + booking.totalPrice,
+      0
+    );
 
     // Calculate total commission earned
-    const totalCommission = totalagencybookings.reduce(
-      (acc, booking) => acc + booking.totalPrice * COMMISSION_PERCENTAGE,
+    const totalCommission = totalAgencyBookings.reduce(
+      (acc, booking) => acc + (booking.totalPrice * COMMISSION_PERCENTAGE) / 100,
       0
     );
 
     // Calculate current month commission
     const currentMonthProfit = currentMonthBookings.reduce(
-      (acc, booking) => acc + booking.totalPrice * COMMISSION_PERCENTAGE,
+      (acc, booking) => acc + (booking.totalPrice * COMMISSION_PERCENTAGE) / 100,
       0
     );
 
     // Calculate last month commission
     const lastMonthProfit = lastMonthBookings.reduce(
-      (acc, booking) => acc + booking.totalPrice * COMMISSION_PERCENTAGE,
+      (acc, booking) => acc + (booking.totalPrice * COMMISSION_PERCENTAGE) / 100,
       0
     );
 
@@ -186,40 +324,32 @@ export const getAgencyDashboardAnalytics = async (req, res) => {
       lastMonthProfit === 0
         ? 100
         : ((currentMonthProfit - lastMonthProfit) / lastMonthProfit) * 100;
-    //   calculate Current Incentives
 
-    // Calculate total current incentives (assuming it's 5% of total price)
-    const CURRENT_INCENTIVES_PERCENTAGE = 0.05; // Assuming current incentives rate is 5%
+    // Calculate total current incentives
     const totalCurrentIncentives = recentBookings.reduce(
-      (acc, booking) =>
-        acc + booking.totalPrice * CURRENT_INCENTIVES_PERCENTAGE,
+      (acc, booking) => acc + (booking.totalPrice * COMMISSION_PERCENTAGE) / 100 * (SALES_TARGET_BONUS_PERCENTAGE / 100),
       0
     );
 
     // Calculate current month incentives
     const currentMonthIncentives = currentMonthBookings.reduce(
       (acc, booking) =>
-        acc + booking.totalPrice * CURRENT_INCENTIVES_PERCENTAGE,
+        acc + booking.totalPrice * (SALES_TARGET_BONUS_PERCENTAGE / 100),
       0
     );
 
     // Calculate last month incentives
     const lastMonthIncentives = lastMonthBookings.reduce(
       (acc, booking) =>
-        acc + booking.totalPrice * CURRENT_INCENTIVES_PERCENTAGE,
+        acc + booking.totalPrice * (SALES_TARGET_BONUS_PERCENTAGE / 100),
       0
     );
-
-    // Calculate percentage difference in commissions
-    // const profitPercentageDifference = lastMonthProfit === 0 ? 100 : ((currentMonthProfit - lastMonthProfit) / lastMonthProfit) * 100;
 
     // Calculate percentage difference in incentives
     const incentivesPercentageDifference =
       lastMonthIncentives === 0
         ? 100
-        : ((currentMonthIncentives - lastMonthIncentives) /
-            lastMonthIncentives) *
-          100;
+        : ((currentMonthIncentives - lastMonthIncentives) / lastMonthIncentives) * 100;
 
     // Calculate percentage difference in booking counts
     const currentMonthCount = currentMonthBookings.length;
@@ -229,12 +359,38 @@ export const getAgencyDashboardAnalytics = async (req, res) => {
         ? 100
         : ((currentMonthCount - lastMonthCount) / lastMonthCount) * 100;
 
+    // Define your threshold
+    const ADDITIONAL_BOOKING_THRESHOLD = 100;
+    const totalBookingsCount = totalAgencyBookings.length;
+
+    let additionalIncentive = 0;
+
+    if (totalSales >= SALES_TARGET) {
+      if (IS_ADDITIONAL_INCENTIVE_FIXED_AMOUNT) {
+        // Use fixed amount per extra booking
+        const extraBookings = totalBookingsCount - ADDITIONAL_BOOKING_THRESHOLD;
+        additionalIncentive = extraBookings > 0
+          ? extraBookings * ADDITIONAL_BOOKING_INCENTIVE
+          : 0;
+      } else {
+        // Use percentage for additional incentive
+        additionalIncentive = totalSales * (ADDITIONAL_BOOKING_INCENTIVE / 100);
+      }
+    }
+
+    // Calculate bonus for meeting/exceeding sales target
+    const salesTargetBonus =
+      totalSales >= SALES_TARGET
+        ? totalSales * (SALES_TARGET_BONUS_PERCENTAGE / 100)
+        : 0;
+
     res.json({
       recentBookings,
       statistics: {
         currentMonthCount,
         lastMonthCount,
         percentageDifference,
+        totalSales,
         totalCommission,
         currentMonthProfit,
         lastMonthProfit,
@@ -243,9 +399,12 @@ export const getAgencyDashboardAnalytics = async (req, res) => {
         currentMonthIncentives,
         lastMonthIncentives,
         incentivesPercentageDifference,
+        additionalIncentive,
+        salesTargetBonus,
       },
     });
   } catch (error) {
+    console.error("Error fetching agency dashboard analytics:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -265,7 +424,7 @@ export const GetAllAgencyInfoWithAgencyId = async (req, res) => {
     const { id } = req.params;
 
     // Fetch the agency by ID
-    const setting = await settingModel.findById('66a63f4a44709647efc24d2d')
+    const setting = await settingModel.findById("66a63f4a44709647efc24d2d");
     const agency = await userModel.findById(id);
 
     if (!agency) {
@@ -277,19 +436,26 @@ export const GetAllAgencyInfoWithAgencyId = async (req, res) => {
 
     // Fetch recent bookings (last month)
     const recentBookings = allBookings.filter(
-      booking => booking.createdAt >= new Date(new Date().setMonth(new Date().getMonth() - 1))
+      (booking) =>
+        booking.createdAt >=
+        new Date(new Date().setMonth(new Date().getMonth() - 1))
     );
 
     // Fetch current month bookings
     const currentMonthBookings = allBookings.filter(
-      booking => booking.createdAt >= new Date(new Date().setDate(1)) && booking.createdAt < new Date(new Date().setMonth(new Date().getMonth() + 1).setDate(1))
+      (booking) =>
+        booking.createdAt >= new Date(new Date().setDate(1)) &&
+        booking.createdAt <
+          new Date(new Date().setMonth(new Date().getMonth() + 1).setDate(1))
     );
 
     // Fetch previous month bookings
     const previousMonthBookings = allBookings.filter(
-      booking =>
-        booking.createdAt >= new Date(new Date().setMonth(new Date().getMonth() - 2).setDate(1)) &&
-        booking.createdAt < new Date(new Date().setMonth(new Date().getMonth() - 1).setDate(1))
+      (booking) =>
+        booking.createdAt >=
+          new Date(new Date().setMonth(new Date().getMonth() - 2).setDate(1)) &&
+        booking.createdAt <
+          new Date(new Date().setMonth(new Date().getMonth() - 1).setDate(1))
     );
 
     const recentBookingCount = recentBookings.length;
@@ -297,18 +463,33 @@ export const GetAllAgencyInfoWithAgencyId = async (req, res) => {
     const previousMonthBookingCount = previousMonthBookings.length;
 
     // Calculate percentage change in bookings
-    const percentageChange = ((currentMonthBookingCount - previousMonthBookingCount) / (previousMonthBookingCount || 1)) * 100;
+    const percentageChange =
+      ((currentMonthBookingCount - previousMonthBookingCount) /
+        (previousMonthBookingCount || 1)) *
+      100;
 
     // Calculate commissions
     const commissionRate = setting.serviceCharges.agency_percentage;
 
-    const totalCommission = allBookings.reduce((sum, booking) => sum + booking.totalPrice * commissionRate, 0);
+    const totalCommission = allBookings.reduce(
+      (sum, booking) => sum + booking.totalPrice * commissionRate,
+      0
+    );
 
-    const currentMonthCommission = currentMonthBookings.reduce((sum, booking) => sum + booking.totalPrice * commissionRate, 0);
+    const currentMonthCommission = currentMonthBookings.reduce(
+      (sum, booking) => sum + booking.totalPrice * commissionRate,
+      0
+    );
 
-    const previousMonthCommission = previousMonthBookings.reduce((sum, booking) => sum + booking.totalPrice * commissionRate, 0);
+    const previousMonthCommission = previousMonthBookings.reduce(
+      (sum, booking) => sum + booking.totalPrice * commissionRate,
+      0
+    );
 
-    const commissionPercentageChange = ((currentMonthCommission - previousMonthCommission) / (previousMonthCommission || 1)) * 100;
+    const commissionPercentageChange =
+      ((currentMonthCommission - previousMonthCommission) /
+        (previousMonthCommission || 1)) *
+      100;
 
     // Calculate incentives (example: 5% of the commission)
     const incentiveRate = 0.05;
@@ -316,22 +497,27 @@ export const GetAllAgencyInfoWithAgencyId = async (req, res) => {
     const currentIncentives = currentMonthCommission * incentiveRate;
     const previousMonthIncentives = previousMonthCommission * incentiveRate;
 
-    const incentivesPercentageChange = ((currentIncentives - previousMonthIncentives) / (previousMonthIncentives || 1)) * 100;
+    const incentivesPercentageChange =
+      ((currentIncentives - previousMonthIncentives) /
+        (previousMonthIncentives || 1)) *
+      100;
 
     // Fetch tours associated with the agency
     const tours = await tourModel.find({ agencyId: id });
 
     // Fetch bookings for each tour
-    const tourBookings = await Promise.all(tours.map(async (tour) => {
-      // Fetch bookings for the current tour
-      const bookingsForTour = await BookingModel.find({ tour: tour._id });
+    const tourBookings = await Promise.all(
+      tours.map(async (tour) => {
+        // Fetch bookings for the current tour
+        const bookingsForTour = await BookingModel.find({ tour: tour._id });
 
-      // Map bookings to include tour_name
-      return bookingsForTour.map(booking => ({
-        ...booking._doc, // Spread existing booking fields
-        tour_name: tour.name // Add tour_name field
-      }));
-    }));
+        // Map bookings to include tour_name
+        return bookingsForTour.map((booking) => ({
+          ...booking._doc, // Spread existing booking fields
+          tour_name: tour.name, // Add tour_name field
+        }));
+      })
+    );
 
     // Flatten the array of arrays
     const flattenedTourBookings = tourBookings.flat();
@@ -350,8 +536,8 @@ export const GetAllAgencyInfoWithAgencyId = async (req, res) => {
         commissionPercentageChange,
         currentIncentives,
         incentivesPercentageChange,
-        tourBookings: flattenedTourBookings // Flattened booking array
-      }
+        tourBookings: flattenedTourBookings, // Flattened booking array
+      },
     });
   } catch (error) {
     res.status(500).json({ msg: error.message, status: false });

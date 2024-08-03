@@ -159,3 +159,14 @@ export const emailVerification = async (req, res) => {
     });
 };
 
+export const getAdmins = async (req,res)=>{
+  try {
+    const admin = await userModel.find({roleId:'667bda9080e2951e9ad32b24'});
+    if(admin.length === 0){
+      return res.status(404).json({msg:'Admin not found',status:false});
+    }
+    res.status(200).json({data:admin,status:true})
+  } catch (error) {
+    res.status(500).json({msg:error.message,status:false});
+  }
+}
