@@ -13,12 +13,12 @@ const Conversation = new mongoose.Schema(
       required: [true,'recipient Id is required']
   },
   lastmsgside:{
-    type:Boolean,
+    type:mongoose.Schema.Types.ObjectId,
   },
   lastmsg:{
     type:String,
   },
-  // 1 = send 2 deliver 3 = seen 4 panding
+  // 1 = send 2 = deliver 3 = seen 4 = panding
   lastmsgstatus:{
     type: Number,
     enum: [1,2,3,4],

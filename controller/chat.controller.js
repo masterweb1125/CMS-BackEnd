@@ -1,3 +1,4 @@
+import { io } from "../index.js";
 import ConversationModel from "../model/chatConversation.model.js";
 import MessageModel from "../model/message.model.js";
 
@@ -7,19 +8,28 @@ export const handleLiveChat = async (req, res) => {
     const { sender, recipient, lastmsgstatus, lastmsg, lastmsgside,} = req.body;
 
     // Check if the conversation already exists
-    let conversation = await ConversationModel.findOne({ sender, recipient });
+    const conversation = await ConversationModel.findOne({
+      $or: [
+          { sender: sender, recipient: recipient },
+          { sender: recipient, recipient: sender }
+      ]
+  });
+  
 
     if (conversation) {
       // Update the existing conversation
       conversation.lastmsg = lastmsg;
       conversation.lastmsgside = lastmsgside;
       conversation.lastmsgstatus = lastmsgstatus;
+      conversation.sender = sender;
+      conversation.recipient = recipient;
+
       await conversation.save();
 
       // Create a new message for the existing conversation
       const message = await MessageModel.create({
         content: lastmsg,
-        conversationId: conversation._id,
+        conversationId: conversation._id, 
         status: lastmsgstatus,
         sender:sender,
         recipient:recipient,
@@ -57,7 +67,26 @@ export const handleLiveChat = async (req, res) => {
 
 
 export const GetConversation = async (req,res)=>{
-//  const conversations
+try {
+  const sender = req.params.senderId;
+  const recipient = req.params.recipientId;
+  const conversation = await ConversationModel.findOne({
+    $or: [
+        { sender: sender, recipient: recipient },
+        { sender: recipient, recipient: sender }
+    ]
+});
+
+if(!conversation){
+  return res.status(200).json({msg:'conversation not found',status:true,frontStatus:false})
+}
+
+io.emit('conversation',conversation)
+
+res.status(200).json({status:true,data:conversation,frontStatus:true})
+} catch (error) {
+  res.status(500).json({msg:error.message,status:false,frontStatus:false});
+}
 }
 
 export const GetAllMessages = async (req, res) => {
