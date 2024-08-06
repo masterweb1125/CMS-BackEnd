@@ -24,6 +24,7 @@ import http from "http"; // Import http
 import { Server } from "socket.io"; // Import Socket.IO
 import { GetConversation } from "./controller/chat.controller.js";
 import ConversationModel from "./model/chatConversation.model.js";
+import { chatUserModel } from "./model/chatingUser.model.js";
 
 const app = express();
 const DB_URL = process.env.DB_URL;
@@ -97,13 +98,35 @@ app.all("*", (req, res) => {
 
 // Socket.IO connection handling
 io.on("connection", (socket) => {
-  console.log("A user connected:", socket.id);
+  // console.log("A user connected:", socket.id);
 
   socket.on("chat message", (msg) => {
     io.emit("update", { msg });
     io.emit("update", { msg });
-    io.emit("chat message", msg);
+    // io.emit('send message',msg)
+    // io.emit("new message", msg);
   });
+
+
+  const users = [];
+
+  socket.on("userStatus", async (data) => {
+    const userexist =await chatUserModel.findById(data._id)
+  
+    if (!userexist) {
+      const newUser = await chatUserModel.create({userId:data._id,isActive:true,lastSeen:Date.now()})
+      
+    } else {
+      // User exists, update their socketId and status
+      users[userIndex].socketId = socket.id;
+      users[userIndex].isOnline = true;
+      users[userIndex].lastSeen = Date.now();
+    }
+  
+    io.emit("status", users);
+    // console.log(data);
+  });
+
   socket.on("conversation", async ({ recipient, sender }) => {
     try {
       const conversation = await ConversationModel.findOne({
@@ -137,8 +160,22 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Handle user disconnect
+  socket.on("send message", (messageData) => {
+    console.log("Message received:", messageData);
+
+    io.emit(messageData.recipient,messageData);
+  });
   socket.on("disconnect", () => {
+    const userIndex = users.findIndex((user) => user.socketId === socket.id);
+
+    if (userIndex !== -1) {
+      // Update the user's status to offline
+      users[userIndex].isOnline = false;
+      users[userIndex].lastSeen = Date.now();
+
+      // Emit the updated user list to all connected clients
+      io.emit("status", users);
+    }
     console.log("User disconnected:", socket.id);
   });
 });
