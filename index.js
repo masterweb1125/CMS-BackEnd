@@ -25,6 +25,8 @@ import { Server } from "socket.io"; // Import Socket.IO
 import { GetConversation } from "./controller/chat.controller.js";
 import ConversationModel from "./model/chatConversation.model.js";
 import { chatUserModel } from "./model/chatingUser.model.js";
+import MessageModel from "./model/message.model.js";
+import ServicesRouter from "./router/services.router.js";
 
 const app = express();
 const DB_URL = process.env.DB_URL;
@@ -87,6 +89,7 @@ app.use("/api/v1/discount", DiscountRouter);
 app.use("/api/v1/transaction", transactionRouter);
 app.use("/api/v1/setting", settingRouter);
 app.use("/api/v1/shift", shiftRouter);
+app.use("/api/v1/services",ServicesRouter)
 
 app.all("*", (req, res) => {
   res.status(500).json({
@@ -107,26 +110,40 @@ io.on("connection", (socket) => {
     // io.emit("new message", msg);
   });
 
-
-  const users = [];
+  // const users = [];
 
   socket.on("userStatus", async (data) => {
-    const userexist =await chatUserModel.findById(data._id)
+    try {
+      const { _id } = data;
   
-    if (!userexist) {
-      const newUser = await chatUserModel.create({userId:data._id,isActive:true,lastSeen:Date.now()})
-      
-    } else {
-      // User exists, update their socketId and status
-      users[userIndex].socketId = socket.id;
-      users[userIndex].isOnline = true;
-      users[userIndex].lastSeen = Date.now();
+      // Check if user exists using userId
+      let user = await chatUserModel.findOne({ userId: _id });
+  
+      if (user) {
+        // Update existing user's details
+        user = await chatUserModel.findOneAndUpdate(
+          { userId: _id },
+          { lastSeen: Date.now(), isActive: true, socketId: socket.id },
+          { new: true }
+        );
+      } else {
+        // Create new user if not exists
+        user = await chatUserModel.create({
+          userId: _id,
+          isActive: true,
+          lastSeen: Date.now(),
+          socketId: socket.id,
+        });
+      }
+  
+      // Retrieve and emit all users' status
+      const users = await chatUserModel.find();
+      io.emit("status", users);
+    } catch (error) {
+      console.error("Error updating user status:", error);
     }
-  
-    io.emit("status", users);
-    // console.log(data);
   });
-
+  
   socket.on("conversation", async ({ recipient, sender }) => {
     try {
       const conversation = await ConversationModel.findOne({
@@ -161,22 +178,28 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send message", (messageData) => {
-    console.log("Message received:", messageData);
+    // console.log("Message received:", messageData);
 
-    io.emit(messageData.recipient,messageData);
+    io.emit(messageData.recipient, messageData);
   });
-  socket.on("disconnect", () => {
-    const userIndex = users.findIndex((user) => user.socketId === socket.id);
-
-    if (userIndex !== -1) {
-      // Update the user's status to offline
-      users[userIndex].isOnline = false;
-      users[userIndex].lastSeen = Date.now();
-
-      // Emit the updated user list to all connected clients
-      io.emit("status", users);
+  socket.on("read", async (data) => {
+    const message = await MessageModel.findById(data.id);
+    if (message) {
+      message.status = 3;
+      await message.save();
     }
-    console.log("User disconnected:", socket.id);
+    io.emit("update", message);
+  });
+  socket.on("disconnect", async () => {
+    const user = await chatUserModel.findOne({ socketId: socket.id });
+    if (user) {
+      user.isActive = false;
+      user.lastSeen = Date.now();
+      user.socketId = socket.id;
+      await user.save();
+    }
+    const users = await chatUserModel.find();
+      io.emit("status", users);
   });
 });
 
